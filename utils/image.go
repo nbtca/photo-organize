@@ -7,9 +7,12 @@ import (
 	_ "image/png"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode"
+	"gocv.io/x/gocv"
+	"gocv.io/x/gocv/contrib"
 
 	"errors"
 	"image/jpeg"
@@ -18,6 +21,20 @@ import (
 
 	"golang.org/x/image/draw"
 )
+
+func DecodeImageCV(filePath string) (string, error) {
+	img := gocv.IMRead(filePath, gocv.IMReadColor)
+	mats := make([]gocv.Mat, 0)
+	path := "../model"
+	wq := contrib.NewWeChatQRCode(path+"/detect.prototxt", path+"/detect.caffemodel",
+		path+"/sr.prototxt", path+"/sr.caffemodel")
+	got := wq.DetectAndDecode(img, &mats)
+	justString := strings.Join(got, " ")
+	if justString == "" {
+		return "", errors.New("no QR code found")
+	}
+	return justString, nil
+}
 
 func DecodeImage(filePath string) (string, error) {
 	// open file
@@ -42,7 +59,6 @@ func DecodeImage(filePath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	return result.GetText(), nil
 }
 

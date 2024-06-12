@@ -42,7 +42,7 @@ func main() {
 
 		// open file
 		filePath := dir + "/" + file.Name()
-		res, err := utils.DecodeImage(filePath)
+		res, err := utils.DecodeImageCV(filePath)
 		if err != nil {
 			log.Printf("No QR code found in file: %v", filePath)
 			continue

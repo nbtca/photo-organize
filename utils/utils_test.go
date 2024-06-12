@@ -139,3 +139,13 @@ func TestImageToBase64(t *testing.T) {
 		log.Print(res)
 	})
 }
+
+func TestDecodeImageCV(t *testing.T) {
+	t.Run("TestDecodeImageCV", func(t *testing.T) {
+		res, _ := utils.DecodeImageCV("./examples/qrcode_blur.jpg")
+		expected := "https://www.nbtca.space/graduation/download?id=a16dcc58-49a5-43d3-aedd-3c41d379ecad"
+		if res != expected {
+			t.Errorf("Expected %s, got %s", expected, res)
+		}
+	})
+}
