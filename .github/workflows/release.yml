@@ -24,6 +24,9 @@ jobs:
             goos: windows
     steps:
     - uses: actions/checkout@v4
+    - uses: Dovyski/setup-opencv-action@v1.1
+      with:
+        opencv-version: '4.9.0'
     - uses: wangyoucao577/go-release-action@v1
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
