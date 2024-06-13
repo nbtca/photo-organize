@@ -11,6 +11,7 @@ import (
 
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode"
+	"github.com/nbtca/photo-organize/model"
 	"gocv.io/x/gocv"
 	"gocv.io/x/gocv/contrib"
 
@@ -25,9 +26,9 @@ import (
 func DecodeImageCV(filePath string) (string, error) {
 	img := gocv.IMRead(filePath, gocv.IMReadColor)
 	mats := make([]gocv.Mat, 0)
-	path := "../model"
-	wq := contrib.NewWeChatQRCode(path+"/detect.prototxt", path+"/detect.caffemodel",
-		path+"/sr.prototxt", path+"/sr.caffemodel")
+	modelPaths := model.NewModelPaths()
+	wq := contrib.NewWeChatQRCode(modelPaths.DetectPrototxt, modelPaths.DetectCaffeModel,
+		modelPaths.SrPrototxt, modelPaths.SrCaffeModel)
 	got := wq.DetectAndDecode(img, &mats)
 	justString := strings.Join(got, " ")
 	if justString == "" {
