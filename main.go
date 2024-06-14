@@ -45,6 +45,14 @@ func main() {
 		res, err := utils.DecodeImageCV(filePath)
 		if err != nil {
 			log.Printf("No QR code found in file: %v", filePath)
+			if currentId == "" {
+				os.Mkdir(tempDir+"/"+"headless", 0755)
+				err := utils.CopyFile(filePath, tempDir+"/"+"headless"+"/"+file.Name())
+				if err != nil {
+					log.Fatal(err)
+				}
+				log.Printf("Move headless file: %v to dir: %v", file.Name(), tempDir+"/"+"headless")
+			}
 			continue
 		}
 		log.Printf("QR code found in file: %v, content: %v", filePath, res)
@@ -59,17 +67,20 @@ func main() {
 		if currentId == "" {
 			currentId = id
 			currentStart = i
-		} else if currentId == res {
-			newDir := dir + "/" + currentId
+		} else if currentId == id {
+			newDir := tempDir + "/" + currentId
+			log.Printf("Create new dir: %v", newDir)
 			err := os.Mkdir(newDir, 0755)
 			if err != nil {
 				log.Fatal(err)
 			}
 			for j := currentStart; j < i; j++ {
-				err := os.Rename(dir+"/"+files[j].Name(), newDir+"/"+files[j].Name())
+				// copy file
+				err = utils.CopyFile(dir+"/"+files[j].Name(), newDir+"/"+files[j].Name())
 				if err != nil {
 					log.Fatal(err)
 				}
+				log.Printf("Move file: %v to dir: %v", files[j].Name(), newDir)
 			}
 			currentId = ""
 			currentStart = -1

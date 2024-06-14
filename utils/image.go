@@ -77,7 +77,7 @@ func GetFileExt(filename string) string {
 func IsPicExt(ext string) bool {
 	exts := []string{".jpg", ".jpeg", ".png"}
 	for _, e := range exts {
-		if e == ext {
+		if e == ext || strings.ToUpper(e)==ext {
 			return true
 		}
 	}

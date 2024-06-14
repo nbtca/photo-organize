@@ -16,3 +16,4 @@ Assume we have a list of photos ordered by time, every group's first and last ph
 2.3.jpg
 2.4.jpg
 ```
+
