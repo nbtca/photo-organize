@@ -2,6 +2,7 @@ package utils
 
 import (
 	"io"
+	"log"
 	"os"
 )
 
@@ -26,4 +27,20 @@ func CopyFile(src, dst string) error {
 	}
 
 	return destinationFile.Sync()
+}
+
+// write file
+func WriteToFile(filePath string, content string) error {
+	file, err := os.Create(filePath)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(content)
+	if err != nil {
+		return err
+	}
+	return file.Sync()
 }

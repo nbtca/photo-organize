@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	_ "image/jpeg"
 	"log"
 	"net/url"
@@ -12,14 +13,25 @@ import (
 
 func main() {
 	var dir string
+	var dest string
+	var dry bool
 	flag.StringVar(&dir, "dir", ".", "dir for files to organize")
+	flag.StringVar(&dest, "dest", "", "dir for output files")
+	flag.BoolVar(&dry, "dry", false, "dry run")
 	flag.Parse()
-
 	log.Printf("dir: %s\n", dir)
 
 	// open and decode image file
 	tempDir, _ := os.MkdirTemp(dir, ".temp")
-	log.Println("Temp dir: ", tempDir)
+	if dry {
+		defer os.RemoveAll(tempDir)
+	}
+	if dest == "" {
+		dest = tempDir
+		log.Println("dest is not set, use temp dir: ", dest)
+	}
+	// create dest if not exist
+	os.Mkdir(dest, 0755)
 
 	// list all files under the directory
 	files, err := os.ReadDir(dir)
@@ -46,12 +58,13 @@ func main() {
 		if err != nil {
 			log.Printf("No QR code found in file: %v", filePath)
 			if currentId == "" {
-				os.Mkdir(tempDir+"/"+"headless", 0755)
-				err := utils.CopyFile(filePath, tempDir+"/"+"headless"+"/"+file.Name())
+				headlessDir := dest + "/" + "headless"
+				os.Mkdir(headlessDir, 0755)
+				err := utils.CopyFile(filePath, headlessDir+"/"+file.Name())
 				if err != nil {
 					log.Fatal(err)
 				}
-				log.Printf("Move headless file: %v to dir: %v", file.Name(), tempDir+"/"+"headless")
+				log.Printf("Move headless file: %v to dir: %v", file.Name(), headlessDir)
 			}
 			continue
 		}
@@ -68,9 +81,11 @@ func main() {
 			currentId = id
 			currentStart = i
 		} else if currentId == id {
-			newDir := tempDir + "/" + currentId
+			newDir := dest + "/" + currentId
 			log.Printf("Create new dir: %v", newDir)
-			err := os.Mkdir(newDir, 0755)
+			os.Mkdir(newDir, 0755)
+			content := fmt.Sprintf("{ \"id\": \"%v\" , \"status\": \"ready\"}", currentId)
+			err := utils.WriteToFile(newDir+"/info.json", content)
 			if err != nil {
 				log.Fatal(err)
 			}
