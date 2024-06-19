@@ -15,38 +15,32 @@ jobs:
     name: Release Go Binary
     container: gocv/opencv:latest
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
-        goos: [linux, windows, darwin]
-        goarch: ["386", amd64, arm64]
-        exclude:
-          - goarch: "386"
-            goos: darwin
-          - goarch: arm64
-            goos: windows
+    # strategy:
+    #   matrix:
+    #     # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
+    #     goos: [linux, windows, darwin]
+    #     goarch: ["386", amd64, arm64]
+    #     exclude:
+    #       - goarch: "386"
+    #         goos: darwin
+    #       - goarch: arm64
+    #         goos: windows
     steps:
       - uses: actions/checkout@v4
       - name: check opencv version
         run: |
           pkg-config --modversion opencv4
-      # - name: Set up Homebrew
-      #   id: set-up-homebrew
-      #   uses: Homebrew/actions/setup-homebrew@master
-      # - name: install opencv
-      #   run: |
-      #     brew install opencv
-      # - name: Set up Go
-      #   uses: actions/setup-go@v2
-      #   with:
-      #     go-version: 1.17
-      # - name: Build Go Binary
-      #   run: go build -o myapp
-      # - uses: Dovyski/setup-opencv-action@v1.1
-      #   with:
-      #     opencv-version: '4.9.0'
-      - uses: wangyoucao577/go-release-action@v1
+      - name: Set up Go
+        uses: actions/setup-go@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          goos: ${{ matrix.goos }}
-          goarch: ${{ matrix.goarch }}
+          go-version: 1.21
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          # either 'goreleaser' (default) or 'goreleaser-pro'
+          distribution: goreleaser
+          # 'latest', 'nightly', or a semver
+          version: "~> v1"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
