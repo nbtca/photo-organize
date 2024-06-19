@@ -2,13 +2,13 @@
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "feature-action"]
   release:
     types: [created]
 
 permissions:
-    contents: write
-    packages: write
+  contents: write
+  packages: write
 
 jobs:
   releases-matrix:
@@ -25,13 +25,24 @@ jobs:
           - goarch: arm64
             goos: windows
     steps:
-    - uses: actions/checkout@v4
-    - uses: Dovyski/setup-opencv-action@v1.1
-      with:
-        opencv-version: '4.9.0'
-        install-deps: false
-    - uses: wangyoucao577/go-release-action@v1
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        goos: ${{ matrix.goos }}
-        goarch: ${{ matrix.goarch }}
+      - uses: actions/checkout@v4
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+      - name: install opencv
+        run: |
+          brew install opencv
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: Build Go Binary
+        run: go build -o myapp
+      # - uses: Dovyski/setup-opencv-action@v1.1
+      #   with:
+      #     opencv-version: '4.9.0'
+      # - uses: wangyoucao577/go-release-action@v1
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     goos: ${{ matrix.goos }}
+      #     goarch: ${{ matrix.goarch }}
