@@ -29,6 +29,7 @@ jobs:
     - uses: Dovyski/setup-opencv-action@v1.1
       with:
         opencv-version: '4.9.0'
+        install-deps: false
     - uses: wangyoucao577/go-release-action@v1
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
