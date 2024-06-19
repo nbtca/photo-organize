@@ -27,6 +27,9 @@ jobs:
             goos: windows
     steps:
       - uses: actions/checkout@v4
+      - name: check opencv version
+        run: |
+          pkg-config --modversion opencv4
       # - name: Set up Homebrew
       #   id: set-up-homebrew
       #   uses: Homebrew/actions/setup-homebrew@master
